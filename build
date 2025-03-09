@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+if [ -d ./build-files ]; then
+    rm -r ./build-files
+fi
+
+mkdir ./build-files
+
+iverilog -g2005-sv -o ./build-files/machine.vvp -c sources.list
+vvp ./build-files/machine.vvp
