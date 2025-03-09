@@ -1,63 +1,94 @@
 // Testbench
+
+`define ALU_ERROR_OUT
+`define ALU_FLAGS_OUT
+
 module main;
 
-    wire [6:0] opm = 0;
-    reg [4:0] cmd = 0;
+    reg [6:0] opm = 0;
+    reg [4:0] cmd = 5'b11111;
     reg signed [63:0] a = 0;
     reg signed [63:0] b = 0;
     wire signed [63:0] out;
+    wire [63:0] regF;
+    wire [63:0] error;
 
     ALU alu0 (.opm (opm),
               .cmd (cmd),
               .a (a),
               .b (b),
+
+`ifdef ALU_ERROR_OUT
+              .error(error),
+`endif
+`ifdef ALU_FLAGS_OUT
+              .regF(regF),
+`endif
+
               .out (out));
 
+    task PrintError;
+        begin
+`ifdef ALU_ERROR_OUT
+            $display("ALU error is  %h (%d)", error, error);
+`endif
+        end
+    endtask
+
+    task PrintOutput;
+        begin
+            $display("ALU output is %h (%d)", out, out);
+        end
+    endtask
+
+    task PrintFlags;
+        begin
+`ifdef ALU_FLAGS_OUT
+            $display("ALU flags are %b-%b-%b", regF[18:16], regF[12:8], regF[6:0]);
+            if (regF[9]) $display("Result is negative");
+            if (regF[11]) $display("Result is zero");
+
+`endif
+        end
+    endtask
+
+    task automatic RunALUCommand (
+            input reg [8*10:0] command_label,
+            input [4:0] command,
+            input [6:0] operation_mode,
+            input [63:0] A,
+            input [63:0] B
+        );
+        begin
+            $display("");
+            $display("----------");
+            $display("Command '%s' [%b]", command_label, command);
+            $display("Operation mode: [%b]", operation_mode);
+            $display("A: %h (%d)", A, A);
+            $display("B: %h (%d)", B, B);
+            PrintFlags();
+            $display("--- Running ---");
+            cmd = command;
+            opm = operation_mode;
+            a = A;
+            b = B;
+            #1;
+            PrintError();
+            PrintOutput();
+            PrintFlags();
+        end
+    endtask
+
     initial begin
-        $display("Start testbench");
-        #0 begin
-            $display("Command ZERO");
-            cmd <= 5'b00000;
-        end
-        #1 $display("Output of zero is %d", out);
-        #1 begin
-            $display("Command SIGN(b)");
-            cmd <= 5'b00001;
-            b <= -1;
-        end
-        #2 $display("Sign of %d is %d", b, out);
-        #2 begin
-            $display("Command PASSFLAG");
-            cmd <= 5'b00010;
-        end
-        #3 $display("Flags are %h (%d)", out, out);
-        #3 begin
-            $display("Command LOADFLAG");
-            cmd <= 5'b00011;
-            a <= 64'hFFFFFFFFFFFFFFFF;
-        end
-        #4 $display("Loadflag out is %d", out);
-        #4 begin
-            $display("Command PASSFLAG");
-            cmd <= 5'b00010;
-        end
-        #5 $display("Flags are %h (%d)", out, out);
-        #5 begin
-            $display("Command LOADFLAG");
-            cmd <= 5'b00011;
-            a <= 64'd0;
-        end
-        #6 $display("Loadflag out is %d", out);
-        #6 begin
-            $display("Command INV");
-            cmd <= 5'b00100;
-            a <= 64'hFFFFFFFFFFFFFFFF;
-        end
-        #7 $display("Inverse of A (%d) is %h (%d)", a, out, out);
-        #7 begin
-            $display("Command PASSFLAG");
-            cmd <= 5'b00010;
-        end
-        #8 $display("Flags are %h (%d)", out, out);
+        $display("--- Running testbench ---");
+        //            label   cmd      opm A  B
+        RunALUCommand("ZERO", 5'b00000, 0, 0, 0);
+        RunALUCommand("SIGN", 5'b00001, 0, 0, -1);
+        RunALUCommand("PASSFLAG", 5'b00010, 0, 0, 0);
+        RunALUCommand("LOADFLAG", 5'b00011, 0, 64'hFFFF, 0);
+        RunALUCommand("LOADFLAG", 5'b00011, 0, 0, 0);
+        RunALUCommand("INV", 5'b00100, 0, -1, 0);
+        RunALUCommand("INV", 5'b00100, 0, 0, 0);
+        RunALUCommand("OR", 5'b00101, 0, 64'hF0F0F0, 64'h0F0F0F);
     end
 endmodule
