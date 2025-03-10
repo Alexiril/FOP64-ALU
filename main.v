@@ -45,9 +45,8 @@ module main;
         begin
 `ifdef ALU_FLAGS_OUT
             $display("ALU flags are %b-%b-%b", regF[18:16], regF[12:8], regF[6:0]);
-            if (regF[9]) $display("Result is negative");
-            if (regF[11]) $display("Result is zero");
-
+            $display("Result is %s", regF[9] ? "negative" : "positive");
+            $display("Result is %s", regF[11] ? "zero" : "non-zero");
 `endif
         end
     endtask
@@ -90,5 +89,16 @@ module main;
         RunALUCommand("INV", 5'b00100, 0, -1, 0);
         RunALUCommand("INV", 5'b00100, 0, 0, 0);
         RunALUCommand("OR", 5'b00101, 0, 64'hF0F0F0, 64'h0F0F0F);
+        RunALUCommand("XOR", 5'b00111, 0, 64'b11111010, 64'b11110101);
+        RunALUCommand("AND", 5'b01000, 0, 64'b1011, 64'b0111);
+        RunALUCommand("XNOR", 5'b01001, 0, 64'b11111010, 64'b11110101);
+        RunALUCommand("RSHIFT0", 5'b01010, 0, 64'b1111, 0);
+        RunALUCommand("RSHIFT1", 5'b01011, 0, 64'b1111, 0);
+        RunALUCommand("LOADFLAG", 5'b00011, 0, 4096, 0);
+        RunALUCommand("RSHIFTL", 5'b01100, 0, 64'b1111, 0);
+        RunALUCommand("RSHIFTS", 5'b01101, 0, -64'hF000000000000000, 0);
+        RunALUCommand("LSHIFT0", 5'b01110, 0, 64'b1111, 0);
+        RunALUCommand("LSHIFT1", 5'b01111, 0, 64'b1111, 0);
+        RunALUCommand("LSHIFTL", 5'b10000, 0, 64'b1111, 0);
     end
 endmodule
