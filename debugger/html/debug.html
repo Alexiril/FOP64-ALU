@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verilog Module Debugger</title>
+    <link rel="stylesheet" href="/shared/style.css">
+    <script src="/shared/jquery.js"></script>
+    <script src="/shared/script.js"></script>
+</head>
+<body>
+    <input type="hidden" id="state" value="read_state">
+    <header><h2>Verilog Module Debugger</h2></header>
+    <main class="even">
+        <aside>
+            <header>Log</header>
+            <div class="log-panel" id="log">
+            </div>
+        </aside>
+        <article>
+            <header class="flex between">
+                <span>Module {{module_name}}</span>
+                <span>
+                    <a href="/create-test">
+                        <button class="secondary">Create new test</button>
+                    </a>
+                    <button id="load-module-button">Load another module</button>
+                </span>
+            </header>
+            <span class="defs">Defines: {{defs}}</span>
+            <div class="tests-panel">
+                <div class="tab">
+                    {{tests_headers}}
+                </div>
+                <table class="tests-table">
+                    <thead>
+                        <tr>
+                            <th>Command name</th>
+                            {{inputs_names}}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{tests}}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+        <aside>
+            <header>Inputs</header>
+            <div class="group">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Input</th>
+                            <th>Bitwidth</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{inputs}}
+                    </tbody>
+                </table>
+            </div>
+            <header>Outputs</header>
+            <div class="group">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Output</th>
+                            <th>Bitwidth</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{outputs}}
+                    </tbody>
+                </table>
+            </div>
+            <header>Debug</header>
+            <div class="group">
+                <label>
+                    <span>Tick</span>
+                    <input type="number" class='short' readonly value="0" id="tick">
+                </label>
+                <div class="debug-buttons">
+                    <button id="run-button">Run</button>
+                    <button class="secondary" id="step-button">One step</button>
+                    <button class="secondary" id="reset-button">Reset</button>
+                    <button id="running-button" class="secondary" disabled style="display: none;flex-grow: 1;">Running...</button>
+                </div>
+            </div>
+        </aside>
+    </main>
+</body>
+</html>

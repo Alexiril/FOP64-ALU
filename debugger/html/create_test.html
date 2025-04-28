@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verilog Module Debugger</title>
+    <link rel="stylesheet" href="/shared/style.css">
+    <script src="/shared/jquery.js"></script>
+    <script src="/shared/create_test.js"></script>
+</head>
+<body>
+    <input type="hidden" id="state" value="read_state">
+    <header><h2>Verilog Module Debugger</h2></header>
+    <main class="even">
+        <article>
+            <header class="flex between">
+                <span>Create new test for module {{module_name}}</span>
+                <span>
+                    <a href="/">
+                        <button>Back to the module debugger</button>
+                    </a>
+                </span>
+            </header>
+            <form id="create-test-form">
+                <div class="row input-field">
+                    <label for="test_name">
+                        Test name:
+                    </label>
+                    <input type="text" name="test_name" id="test_name" required pattern="[A-Za-z0-9_\-]+">
+                </div>
+                <table class="tests-table">
+                    <thead>
+                        <tr>
+                            <th>Command name</th>
+                            {{inputs_names}}
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td>
+                                <button type="button" id="add-command-button">Add command</button>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <button type="submit" class="row" id="send-form-button">Create</button>
+            </form>
+        </article>
+    </main>
+    <div id="new-command-panel" style="display: none;">
+        <div class="full-window-wrapper">
+            <article class="center-panel">
+                <header class="flex center">
+                    Add new command
+                </header>
+                <form>
+                    <div class="row input-field">
+                        <label for="command_name">
+                            Command name:
+                        </label>
+                        <input type="text" name="command_name" id="command_name" class="new-command-input" data-order="0">
+                    </div>
+                    {{new_command_fields}}
+                    <hr class="row">
+                    <button type="button" class="row" id="create-command-button">Add</button>
+                    <button type="button" class="row secondary" id="cancel-command-button">Cancel</button>
+                </form>
+            </article>
+        </div>
+    </div>
+</body>
+</html>

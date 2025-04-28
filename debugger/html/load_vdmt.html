@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verilog Module Debugger</title>
+    <link rel="stylesheet" href="/shared/style.css">
+    <script src="/shared/jquery.js"></script>
+    <script src="/shared/script.js"></script>
+</head>
+<body>
+    <header><h2>Verilog Module Debugger</h2></header>
+    <main class="center">
+        <article>
+            <form action="/parse-vdmt" method="post" enctype="multipart/form-data">
+                <div class="form-field">
+                    <label class="input-file">
+                        <span class="input-file-text" type="text">File...</span>
+                        <input type="file" required name="vdmt" id="vdmt-file">
+                        <span class="input-file-button">
+                            Select the Verilog file with VDMT header inside
+                        </span>
+                    </label>
+                </div>
+                <br>
+                <hr>
+                <div class="form-field">
+                    <button type="submit">
+                        Parse file
+                    </button>
+                </div>
+            </form>
+        </article>
+    </main>
+</body>
+</html>
