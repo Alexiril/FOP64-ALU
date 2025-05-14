@@ -161,24 +161,26 @@ module ALU(
         integer i;
         begin
             shiftResult = A;
-            for (i = 0; i < bits; i = i + 1) begin
-                if (rotation == 0) begin
-                    if (direction == 0) begin
-                        shiftResult = shiftResult << 1;
-                        shiftResult[0] = fill_bit;
+            for (i = 0; i < 6'b111111; i = i + 1) begin
+                if (i < bits) begin
+                    if (rotation == 0) begin
+                        if (direction == 0) begin
+                            shiftResult = shiftResult << 1;
+                            shiftResult[0] = fill_bit;
+                        end else begin
+                            shiftResult = shiftResult >> 1;
+                            shiftResult[63] = fill_bit;
+                        end
                     end else begin
-                        shiftResult = shiftResult >> 1;
-                        shiftResult[63] = fill_bit;
-                    end
-                end else begin
-                    if (direction == 0) begin
-                        shiftRotationBit = shiftResult[63];
-                        shiftResult = shiftResult << 1;
-                        shiftResult[0] = shiftRotationBit;
-                    end else begin
-                        shiftRotationBit = shiftResult[0];
-                        shiftResult = shiftResult >> 1;
-                        shiftResult[63] = shiftRotationBit;
+                        if (direction == 0) begin
+                            shiftRotationBit = shiftResult[63];
+                            shiftResult = shiftResult << 1;
+                            shiftResult[0] = shiftRotationBit;
+                        end else begin
+                            shiftRotationBit = shiftResult[0];
+                            shiftResult = shiftResult >> 1;
+                            shiftResult[63] = shiftRotationBit;
+                        end
                     end
                 end
             end
@@ -186,7 +188,8 @@ module ALU(
         end
     endfunction
 
-    always @(a or b or cmd or opm) begin
+    //always @(a or b or cmd or opm) begin
+    always @* begin
         case (cmd)
             `CMD_ZERO: begin
                 regR = 64'd0;
@@ -253,11 +256,13 @@ module ALU(
             end
             `CMD_PRIOR: begin
                 integer i;
+                reg found;
                 flagsPR = 6'd0;
+                found = 1'b0;
                 for (i = 63; i >= 0; i = i - 1) begin
-                    if (a[i]) begin
+                    if (a[i] && !found) begin
                         flagsPR = i;
-                        break;
+                        found = 1'b1;
                     end
                 end
                 regR = flagsPR;
