@@ -298,12 +298,12 @@ class Handler(BaseHTTPRequestHandler):
         for index, i in enumerate(vdmt_file["inputs"]):
             inputs += (
                 f"<tr><td>{i['human_name']}</td><td class='centered'>{i['bits']}</td>"
-                f"<td class='centered'><input readonly type='text' value='0' id='input-{i['name']}'></td></tr>"
+                f"<td class='centered'><input readonly type='text' value='0' data-actualvalue='0' class='diff-base' id='input-{i['name']}'></td></tr>"
             )
             inputs_names += f"<th>{i['human_name']}</th>"
             new_command_fields += (
                 f'<div class="row input-field"><label for="{i["name"]}">{i["human_name"]}:</label>'
-                f'<input type="number" name="{i["name"]}" id="{i["name"]}" class="new-command-input" '
+                f'<input type="text" name="{i["name"]}" id="{i["name"]}" class="new-command-input" '
                 f'data-order="{index + 1}"></div>'
             )
         html = html.replace("{{inputs}}", inputs)
@@ -312,7 +312,7 @@ class Handler(BaseHTTPRequestHandler):
         for i in vdmt_file["outputs"]:
             outputs += (
                 f"<tr><td>{i['human_name']}</td><td class='centered'>{i['bits']}</td>"
-                f"<td class='centered'><input readonly type='text' value='0' id='output-{i['name']}'></td></tr>"
+                f"<td class='centered'><input readonly type='text' value='0' data-actualvalue='0' class='diff-base' id='output-{i['name']}'></td></tr>"
             )
         html = html.replace("{{outputs}}", outputs)
         tests_headers = ""
@@ -323,7 +323,7 @@ class Handler(BaseHTTPRequestHandler):
             for i in test["instructions"]:
                 line = f"<td>{i['name']}</td>"
                 for param in i["params"]:
-                    line += f"<td>{param}</td>"
+                    line += f"<td class='diff-base' data-actualvalue='{param}'>{param}</td>"
                 tests += f"""<tr class="{test["name"]} tabcontent {"selected" if first else ""}">{line}</tr>"""
                 first = False
         html = html.replace("{{tests_headers}}", tests_headers)

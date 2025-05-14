@@ -49,6 +49,10 @@ test All-functions {
     ROTM:28:0b0000100:0xC000000000000003:0
     MODBITM:29:0b1000011:0:0
 }
+test Sum-spec {
+    ADD:19:0:10:15
+    NEG:17:0:5:0
+}
 */
 
 module ALU(
@@ -135,29 +139,19 @@ module ALU(
     reg sumFlagV = 0;
     reg sumFlagC = 0;
 
-    function [63:0] sum (input signed [63:0] A, B);
-        reg [63:0] sumPropagatedCarry;
-        reg [64:0] sumExtendedA ;
-        reg [64:0] sumExtendedB;
-        reg [64:0] sumExtendedC;
-        reg [63:0] sumResult;
-        integer i;
+    function [63:0] sum (input [63:0] A, B);
+        reg [64:0] C;
+        reg [63:0] G, P, SUM;
+        integer jj;
         begin
-            sumExtendedA = {A[63], A};
-            sumExtendedB = {B[63], B};
-            sumExtendedC = sumExtendedA + sumExtendedB;
-            sumResult = sumExtendedC[63:0];
-            sumFlagV = (A[63] == B[63]) && (sumResult[63] != A[63]);
-
-            // carry calculation
-            sumPropagatedCarry = 64'b0;
-            sumPropagatedCarry[0] = A[0] & 1'b1;
-            for (i = 1; i < 64; i = i + 1) begin
-                sumPropagatedCarry[i] = (A[i] & sumResult[i-1]) | (A[i] & sumPropagatedCarry[i-1]);
+            C[0] = 1'b0;
+            for (jj = 0; jj < 64; jj = jj + 1) begin
+                C[jj+1] = (A[jj] & B[jj]) | ((A[jj] ^ B[jj]) & C[jj]);
+                SUM[jj] = A[jj] ^ B[jj] ^ C[jj];
             end
-            sumFlagC = |sumPropagatedCarry[63:1];
-
-            sum = sumResult;
+            sumFlagC = C[64];
+            sumFlagV = C[64] ^ C[63];
+            sum = SUM;
         end
     endfunction
 
@@ -294,8 +288,8 @@ module ALU(
                 regF[`flagC] = sumFlagC;
             end
             `CMD_SUB: begin
-                regR = sum(a, ~b);
-                regR = sum(regR, 1);
+                regR = sum(~b, 1);
+                regR = sum(a, regR);
                 regF[`flagV] = sumFlagV;
                 regF[`flagC] = sumFlagC;
             end

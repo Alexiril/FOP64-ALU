@@ -13,8 +13,16 @@ $(function () {
             const e = $(this)
             cells[parseInt(e.data('order'))] = e.val()
         })
+        number_base = $("#number-system").find(":selected").val();
+        let first = true;
         for (const [key, value] of Object.entries(cells)) {
-            row.append($(`<td>${value}</td>`))
+            if (first) {
+                row.append($(`<td data-actualvalue='${value}'>${value}</td>`))
+                first = false;
+                continue;
+            }
+            const actualvalue = parseInt(value, parseInt(number_base));
+            row.append($(`<td class='diff-base' data-actualvalue='${actualvalue}'>${value}</td>`))
         }
         tbody.append(row)
         $('#new-command-panel').hide()
@@ -30,7 +38,7 @@ $(function () {
             let command_name = ""
             const values = []
             row.children('td').each(function (index, element) {
-                const value = $(element).text()
+                const value = $(element).data('actualvalue')
                 if (index == 0)
                     command_name = value
                 else
@@ -50,5 +58,12 @@ $(function () {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(result)
         }).then(_ => location.assign('/'))
+    })
+    $('#number-system').on('change', function() {
+        number_base = $(this).find(":selected").val();
+        $("td.diff-base").each(function() {
+            const actualvalue = $(this).data('actualvalue');
+            $(this).text(parseInt(actualvalue).toString(parseInt(number_base)));
+        });
     })
 })

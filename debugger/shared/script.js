@@ -19,14 +19,15 @@ function update_state() {
                     $(element).addClass("selected");
             })
         }
+        number_base = $("#number-system").find(":selected").val();
         if (data.inputs_values !== undefined) {
             for (const [name, value] of Object.entries(data.inputs_values)) {
-                $(`#input-${name}`).val(value);
+                $(`#input-${name}`).val(parseInt(value).toString(parseInt(number_base))).data('actualvalue', value);
             }
         }
         if (data.outputs_values !== undefined) {
             for (const [name, value] of Object.entries(data.outputs_values)) {
-                $(`#output-${name}`).val(value);
+                $(`#output-${name}`).val(parseInt(value).toString(parseInt(number_base))).data('actualvalue', value);
             }
         }
         if (data.running !== undefined) {
@@ -84,4 +85,15 @@ $(function () {
     if ($('input#state').val() == "read_state") {
         setTimeout(update_state, 1000);
     }
+    $('#number-system').on('change', function() {
+        number_base = $(this).find(":selected").val();
+        $("input.diff-base").each(function() {
+            const actualvalue = $(this).data('actualvalue');
+            $(this).val(parseInt(actualvalue).toString(parseInt(number_base)));
+        });
+        $("td.diff-base").each(function() {
+            const actualvalue = $(this).data('actualvalue');
+            $(this).text(parseInt(actualvalue).toString(parseInt(number_base)));
+        });
+    })
 });
