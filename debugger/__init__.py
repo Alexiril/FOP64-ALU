@@ -177,8 +177,10 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:  # pylint: disable=broad-exception-caught
                 self.response_code = 500
                 return
-            vdmt_file["tests"] = [ # type: ignore  # pylint: disable=unsupported-assignment-operation
-                test for test in vdmt_file["tests"] if test["name"] != inp["name"] # type: ignore  # pylint: disable=unsubscriptable-object
+            vdmt_file["tests"] = [  # type: ignore  # pylint: disable=unsupported-assignment-operation
+                test
+                for test in vdmt_file["tests"]
+                if test["name"] != inp["name"]  # type: ignore  # pylint: disable=unsubscriptable-object
             ]
             vdmt_file["tests"].append(inp)  # type: ignore  # pylint: disable=unsubscriptable-object
         else:
@@ -478,6 +480,10 @@ class Handler(BaseHTTPRequestHandler):
 
         commands = ""
         for x in test["instructions"]:
+            x["params"] = [
+                param if isinstance(param, int) else 0
+                for param in x["params"]
+            ]
             commands += f"runcommand({','.join(map(str, x['params']))});\n"
         return f"""
 // Testbench '{test["name"]}'
