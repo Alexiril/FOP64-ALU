@@ -177,6 +177,9 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:  # pylint: disable=broad-exception-caught
                 self.response_code = 500
                 return
+            vdmt_file["tests"] = [ # type: ignore  # pylint: disable=unsupported-assignment-operation
+                test for test in vdmt_file["tests"] if test["name"] != inp["name"] # type: ignore  # pylint: disable=unsubscriptable-object
+            ]
             vdmt_file["tests"].append(inp)  # type: ignore  # pylint: disable=unsubscriptable-object
         else:
             self.response_code = 404
@@ -323,7 +326,9 @@ class Handler(BaseHTTPRequestHandler):
             for i in test["instructions"]:
                 line = f"<td>{i['name']}</td>"
                 for param in i["params"]:
-                    line += f"<td class='diff-base' data-actualvalue='{param}'>{param}</td>"
+                    line += (
+                        f"<td class='diff-base' data-actualvalue='{param}'>{param}</td>"
+                    )
                 tests += f"""<tr class="{test["name"]} tabcontent {"selected" if first else ""}">{line}</tr>"""
                 first = False
         html = html.replace("{{tests_headers}}", tests_headers)
@@ -414,7 +419,7 @@ class Handler(BaseHTTPRequestHandler):
         )[0]  # type: ignore
         vdmt_file["current_state"]["selected_test"] = t["name"]
         v_file = build_folder / f"{vdmt_file['module']}_{t['name']}.v"
-        test = self.generate_testbench(t) # type: ignore
+        test = self.generate_testbench(t)  # type: ignore
         with open(v_file, "wt", encoding="utf-8") as out:
             out.write(test)
             out.write(vdmt_file["code"])
