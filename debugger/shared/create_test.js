@@ -11,7 +11,11 @@ $(function () {
         const cells = {}
         $('.new-command-input').each(function () {
             const e = $(this)
-            cells[parseInt(e.data('order'))] = e.val()
+            let value = e.val()
+            if (value === "") {
+                value = "0"
+            }
+            cells[parseInt(e.data('order'))] = value
         })
         number_base = $("#number-system").find(":selected").val();
         let first = true;
