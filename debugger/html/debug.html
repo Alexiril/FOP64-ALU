@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verilog Module Debugger</title>
     <link rel="stylesheet" href="/shared/style.css">
+    <link rel="stylesheet" href="/shared/fontawesome/css/all.css">
     <script src="/shared/jquery.js"></script>
     <script src="/shared/script.js"></script>
 </head>
@@ -45,6 +46,7 @@
                         <tr>
                             <th>Command name</th>
                             {{inputs_names}}
+                            <th>Edit</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -53,7 +55,7 @@
                 </table>
             </div>
         </article>
-        <aside>
+        <aside class="big">
             <header>Inputs</header>
             <div class="group">
                 <table>
@@ -99,5 +101,28 @@
             </div>
         </aside>
     </main>
+    <div id="new-command-panel" style="display: none;">
+        <div class="full-window-wrapper">
+            <article class="center-panel">
+                <header class="flex center">
+                    Change command
+                </header>
+                <form>
+                    <input type="hidden" id="change_command_test">
+                    <input type="hidden" id="change_command_index">
+                    <div class="row input-field">
+                        <label for="command_name">
+                            Command name:
+                        </label>
+                        <input type="text" id="command_name" class="new-command-input" data-order="0">
+                    </div>
+                    {{new_command_fields}}
+                    <hr class="row">
+                    <button type="button" class="row" onclick="sendeditcommand()">Change</button>
+                    <button type="button" class="row secondary" onclick="$('#new-command-panel').hide()">Cancel</button>
+                </form>
+            </article>
+        </div>
+    </div>
 </body>
 </html>

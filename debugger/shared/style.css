@@ -145,6 +145,10 @@ main aside {
     overflow-y: auto;
 }
 
+main aside.big {
+    width: 60vh;
+}
+
 main aside .group {
     padding: 1em;
 }

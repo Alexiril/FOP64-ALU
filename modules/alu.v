@@ -10,48 +10,48 @@ decl {
     o:64:n:regF:Flags
 }
 test All-functions {
-    ZERO:0:0:0:0
-    SIGN:1:0:0:-1
-    PASSFLAG:2:0:0:0
-    LOADFLAG:3:0:0xFFFF:0
-    LOADFLAG:3:0:0:0
-    INV:4:0:-1:0
-    INV:4:0:0:0
-    OR:5:0:0xF0F0F0:0x0F0F0F
-    XOR:6:0:0b11111010:0b11110101
-    AND:7:0:0b1011:0b0111
-    XNOR:8:0:0b11111010:0b11110101
-    RSHIFT0:9:0:0b1111:0
-    RSHIFT1:10:0:0b1111:0
-    LOADFLAG:3:0:4096:0
-    RSHIFTL:11:0:0b1111:0
-    RSHIFTS:12:0:-0xF000000000000000:0
-    LSHIFT0:13:0:0b1111:0
-    LSHIFT1:14:0:0b1111:0
-    LSHIFTL:15:0:0b1111:0
-    PRIOR:16:0:0b1000:0
-    NEG:17:0:-5:0
-    NEG:17:0:5:0
-    ADDM:18:-2:5:0
-    ADD:19:0:10:-15
-    ADDC:20:0:1:1
-    SUB:21:0:100:15
-    SUB:21:0:-15:100
-    SUBC:22:0:10:5
-    LOADFLAG:3:0:0b0000010:0
-    SHIFTN0:23:0:1:0
-    LOADFLAG:3:0:0b1000010:0
-    SHIFTNS:24:0:-4:0
-    LOADFLAG:3:0:0b0000100:0
-    ROTN:25:0:0xC000000000000003:0
-    SHFITM0:26:0b0000010:1:0
-    SHIFTMS:27:0b1000010:-4:0
-    ROTM:28:0b0000100:0xC000000000000003:0
-    MODBITM:29:0b1000011:0:0
+    ZERO:1:0:0:0
+    SIGN:2:0:0:-1
+    PASSFLAG:3:0:0:0
+    LOADFLAG:4:0:0xFFFF:0
+    LOADFLAG:4:0:0:0
+    INV:5:0:-1:0
+    INV:5:0:0:0
+    OR:6:0:0xF0F0F0:0x0F0F0F
+    XOR:7:0:0b11111010:0b11110101
+    AND:8:0:0b1011:0b0111
+    XNOR:9:0:0b11111010:0b11110101
+    RSHIFT0:10:0:0b1111:0
+    RSHIFT1:11:0:0b1111:0
+    LOADFLAG:4:0:4096:0
+    RSHIFTL:12:0:0b1111:0
+    RSHIFTS:13:0:-0xF000000000000000:0
+    LSHIFT0:14:0:0b1111:0
+    LSHIFT1:15:0:0b1111:0
+    LSHIFTL:16:0:0b1111:0
+    PRIOR:17:0:0b1000:0
+    NEG:18:0:-5:0
+    NEG:18:0:5:0
+    ADDM:19:-2:5:0
+    ADD:20:0:10:-15
+    ADDC:21:0:1:1
+    SUB:22:0:100:15
+    SUB:22:0:-15:100
+    SUBC:23:0:10:5
+    LOADFLAG:4:0:0b0000010:0
+    SHIFTN0:24:0:1:0
+    LOADFLAG:4:0:0b1000010:0
+    SHIFTNS:25:0:-4:0
+    LOADFLAG:4:0:0b0000100:0
+    ROTN:26:0:0xC000000000000003:0
+    SHFITM0:27:0b0000010:1:0
+    SHIFTMS:28:0b1000010:-4:0
+    ROTM:29:0b0000100:0xC000000000000003:0
+    MODBITM:30:0b1000011:0:0
 }
 test Sum-spec {
-    ADD:19:0:10:15
-    NEG:17:0:5:0
+    ADD:20:0:10:15
+    NEG:18:0:5:0
 }
 */
 
@@ -96,45 +96,45 @@ module ALU(
 
     reg [63:0] mask = 0;
 
-    `define CMD_ZERO 5'b00000
-    `define CMD_SIGN 5'b00001
-    `define CMD_PASSFLAG 5'b00010
-    `define CMD_LOADFLAG 5'b00011
+    `define CMD_ZERO 5'b00001
+    `define CMD_SIGN 5'b00010
+    `define CMD_PASSFLAG 5'b00011
+    `define CMD_LOADFLAG 5'b00100
 
-    `define CMD_INV 5'b00100
-    `define CMD_OR 5'b00101
-    `define CMD_XOR 5'b00110
-    `define CMD_AND 5'b00111
-    `define CMD_XNOR 5'b01000
+    `define CMD_INV 5'b00101
+    `define CMD_OR 5'b00110
+    `define CMD_XOR 5'b00111
+    `define CMD_AND 5'b01000
+    `define CMD_XNOR 5'b01001
 
-    `define CMD_RSHIFT0 5'b01001
-    `define CMD_RSHIFT1 5'b01010
-    `define CMD_RSHIFTL 5'b01011
-    `define CMD_RSHIFTS 5'b01100
+    `define CMD_RSHIFT0 5'b01010
+    `define CMD_RSHIFT1 5'b01011
+    `define CMD_RSHIFTL 5'b01100
+    `define CMD_RSHIFTS 5'b01101
 
-    `define CMD_LSHIFT0 5'b01101
-    `define CMD_LSHIFT1 5'b01110
-    `define CMD_LSHIFTL 5'b01111
+    `define CMD_LSHIFT0 5'b01110
+    `define CMD_LSHIFT1 5'b01111
+    `define CMD_LSHIFTL 5'b10000
 
-    `define CMD_PRIOR 5'b10000
-    `define CMD_NEG 5'b10001
+    `define CMD_PRIOR 5'b10001
+    `define CMD_NEG 5'b10010
     
-    `define CMD_ADDM 5'b10010
-    `define CMD_ADD 5'b10011
-    `define CMD_ADDC 5'b10100
+    `define CMD_ADDM 5'b10011
+    `define CMD_ADD 5'b10100
+    `define CMD_ADDC 5'b10101
 
-    `define CMD_SUB 5'b10101
-    `define CMD_SUBC 5'b10110
+    `define CMD_SUB 5'b10110
+    `define CMD_SUBC 5'b10111
 
-    `define CMD_SHIFTN0 5'b10111
-    `define CMD_SHIFTNS 5'b11000
-    `define CMD_ROTN 5'b11001
+    `define CMD_SHIFTN0 5'b11000
+    `define CMD_SHIFTNS 5'b11001
+    `define CMD_ROTN 5'b11010
 
-    `define CMD_SHIFTM0 5'b11010
-    `define CMD_SHIFTMS 5'b11011
-    `define CMD_ROTM 5'b11100
+    `define CMD_SHIFTM0 5'b11011
+    `define CMD_SHIFTMS 5'b11100
+    `define CMD_ROTM 5'b11101
 
-    `define CMD_MODBITM 5'b11101
+    `define CMD_MODBITM 5'b11110
 
     reg sumFlagV = 0;
     reg sumFlagC = 0;

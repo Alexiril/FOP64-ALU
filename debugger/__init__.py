@@ -179,10 +179,43 @@ class Handler(BaseHTTPRequestHandler):
                 return
             vdmt_file["tests"] = [  # type: ignore  # pylint: disable=unsupported-assignment-operation
                 test
-                for test in vdmt_file["tests"]
+                for test in vdmt_file["tests"]  # type: ignore  # pylint: disable=unsubscriptable-object
                 if test["name"] != inp["name"]  # type: ignore  # pylint: disable=unsubscriptable-object
             ]
             vdmt_file["tests"].append(inp)  # type: ignore  # pylint: disable=unsubscriptable-object
+        elif self.path == "/edit-command" and self.request_method == "POST":
+            if vdmt_file is None:
+                self.response_code = 500
+                return
+            content_length = int(self.headers["Content-Length"])
+            inp_bytes = self.rfile.read(content_length)
+            try:
+                inp = loads(inp_bytes.decode())
+            except Exception:  # pylint: disable=broad-exception-caught
+                self.response_code = 500
+                return
+            named_tests = [test for test in vdmt_file["tests"] if test["name"] == inp["test"]]
+            if len(named_tests) != 1:
+                self.response_code = 500
+                return
+            test = named_tests[0]
+            if inp["index"] < 0 or inp["index"] >= len(test["instructions"]):
+                self.response_code = 500
+                return
+            test["instructions"][inp["index"]]["name"] = inp["name"]
+            test["instructions"][inp["index"]]["params"] = inp["params"]
+            vdmt_file["step"] = 0
+            vdmt_file["current_state"].update(
+                {
+                    "log": [],
+                    "tick": 0,
+                    "selected_test": "",
+                    "selected_instruction": 0,
+                    "inputs_values": {},
+                    "outputs_values": {},
+                    "running": 0,
+                }
+            )
         else:
             self.response_code = 404
 
@@ -303,13 +336,13 @@ class Handler(BaseHTTPRequestHandler):
         for index, i in enumerate(vdmt_file["inputs"]):
             inputs += (
                 f"<tr><td>{i['human_name']}</td><td class='centered'>{i['bits']}</td>"
-                f"<td class='centered'><input readonly type='text' value='0' data-actualvalue='0' class='diff-base' id='input-{i['name']}'></td></tr>"
+                f"<td class='centered'><input readonly type='text' value='0' data-actualvalue='0' data-binarybits='{i['bits']}' class='diff-base' id='input-{i['name']}'></td></tr>"
             )
             inputs_names += f"<th>{i['human_name']}</th>"
             new_command_fields += (
                 f'<div class="row input-field"><label for="{i["name"]}">{i["human_name"]}:</label>'
                 f'<input type="text" name="{i["name"]}" id="{i["name"]}" class="new-command-input" '
-                f'data-order="{index + 1}"></div>'
+                f'data-order="{index + 1}" data-binarybits="{i['bits']}"></div>'
             )
         html = html.replace("{{inputs}}", inputs)
         html = html.replace("{{inputs_names}}", inputs_names)
@@ -317,7 +350,7 @@ class Handler(BaseHTTPRequestHandler):
         for i in vdmt_file["outputs"]:
             outputs += (
                 f"<tr><td>{i['human_name']}</td><td class='centered'>{i['bits']}</td>"
-                f"<td class='centered'><input readonly type='text' value='0' data-actualvalue='0' class='diff-base' id='output-{i['name']}'></td></tr>"
+                f"<td class='centered'><input readonly type='text' value='0' data-actualvalue='0' data-binarybits='{i['bits']}' class='diff-base' id='output-{i['name']}'></td></tr>"
             )
         html = html.replace("{{outputs}}", outputs)
         tests_headers = ""
@@ -325,12 +358,11 @@ class Handler(BaseHTTPRequestHandler):
         for test in vdmt_file["tests"]:
             tests_headers += f"""<button class="tablinks" data-tab="{test["name"]}">{test["name"]}</button>"""
             first = True
-            for i in test["instructions"]:
+            for i_index, i in enumerate(test["instructions"]):
                 line = f"<td>{i['name']}</td>"
-                for param in i["params"]:
-                    line += (
-                        f"<td class='diff-base' data-actualvalue='{param}'>{param}</td>"
-                    )
+                for index, param in enumerate(i["params"]):
+                    line += f"<td class='diff-base' data-actualvalue='{param}' data-binarybits='{vdmt_file['inputs'][index]['bits']}'>{param}</td>"
+                line += f"<td><button onclick='edittestcommand(\"{test['name']}\", {i_index}, \"{i['name']}\", [{','.join(map(str, i['params']))}])'><i class='fa-solid fa-pencil'></i></button></td>"
                 tests += f"""<tr class="{test["name"]} tabcontent {"selected" if first else ""}">{line}</tr>"""
                 first = False
         html = html.replace("{{tests_headers}}", tests_headers)
@@ -481,8 +513,7 @@ class Handler(BaseHTTPRequestHandler):
         commands = ""
         for x in test["instructions"]:
             x["params"] = [
-                param if isinstance(param, int) else 0
-                for param in x["params"]
+                param if isinstance(param, int) else 0 for param in x["params"]
             ]
             commands += f"runcommand({','.join(map(str, x['params']))});\n"
         return f"""
