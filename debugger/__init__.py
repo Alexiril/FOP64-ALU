@@ -342,7 +342,7 @@ class Handler(BaseHTTPRequestHandler):
             new_command_fields += (
                 f'<div class="row input-field"><label for="{i["name"]}">{i["human_name"]}:</label>'
                 f'<input type="text" name="{i["name"]}" id="{i["name"]}" class="new-command-input" '
-                f'data-order="{index + 1}" data-binarybits="{i['bits']}"></div>'
+                f'data-order="{index + 1}" data-binarybits="{i["bits"]}"></div>'
             )
         html = html.replace("{{inputs}}", inputs)
         html = html.replace("{{inputs_names}}", inputs_names)
